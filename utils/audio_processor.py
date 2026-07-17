@@ -125,6 +125,33 @@ def _pick_download_format(info: dict) -> str | None:
     return best_format.get("format_id")
 
 
+def _candidate_download_formats(info: dict) -> list[str]:
+    formats = info.get("formats") or []
+
+    def score(fmt: dict) -> tuple:
+        ext = fmt.get("ext") or ""
+        audio_only = fmt.get("vcodec") == "none" and fmt.get("acodec") != "none"
+        has_audio = fmt.get("acodec") != "none"
+        preferred_ext = 0 if ext in {"m4a", "mp4", "webm", "opus"} else 1
+        bitrate = fmt.get("abr") or fmt.get("tbr") or 0
+        return (
+            0 if audio_only else 1,
+            0 if has_audio else 1,
+            preferred_ext,
+            -bitrate,
+        )
+
+    candidates = []
+    for fmt in sorted(
+        (fmt for fmt in formats if fmt.get("acodec") != "none"), key=score
+    ):
+        format_id = fmt.get("format_id")
+        if format_id and format_id not in candidates:
+            candidates.append(format_id)
+
+    return candidates[:6]
+
+
 def download_youtube_audio(url: str) -> str:
     last_error = None
 
@@ -139,23 +166,37 @@ def download_youtube_audio(url: str) -> str:
             print(f"Trying YouTube client profile: {client_name}")
             with yt_dlp.YoutubeDL(_build_ydl_opts(player_clients)) as ydl:
                 info = ydl.extract_info(url, download=False)
-                selected_format = _pick_download_format(info)
-                if not selected_format:
+                candidate_formats = _candidate_download_formats(info)
+                if not candidate_formats:
                     raise RuntimeError(
                         "No audio-capable format was exposed by YouTube for this video."
                     )
 
-                download_opts = _build_ydl_opts(player_clients)
-                download_opts["format"] = selected_format
+            for candidate_format in candidate_formats:
+                try:
+                    print(f"Trying format candidate: {candidate_format}")
+                    download_opts = _build_ydl_opts(player_clients)
+                    download_opts["format"] = candidate_format
 
-            with yt_dlp.YoutubeDL(download_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                filename = (
-                    ydl.prepare_filename(info)
-                    .replace(".webm", ".wav")
-                    .replace(".m4a", ".wav")
-                )
-                return filename
+                    with yt_dlp.YoutubeDL(download_opts) as ydl:
+                        info = ydl.extract_info(url, download=True)
+                        filename = (
+                            ydl.prepare_filename(info)
+                            .replace(".webm", ".wav")
+                            .replace(".m4a", ".wav")
+                        )
+                        return filename
+                except Exception as format_error:
+                    format_message = str(format_error)
+                    print(
+                        f"Format candidate {candidate_format} failed for profile {player_clients or 'default'}: {format_message}"
+                    )
+                    if (
+                        "Requested format is not available" not in format_message
+                        and "403" not in format_message
+                        and "Forbidden" not in format_message
+                    ):
+                        raise
         except Exception as error:
             last_error = error
             message = str(error)

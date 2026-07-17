@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:0a0a16,45:1a1a3e,100:2d1b69&height=240&section=header&text=NEXUS%20AI&fontSize=62&fontColor=ffffff&animation=fadeIn&fontAlignY=32&desc=Meeting%20Intelligence%20%E2%80%A2%20Whisper%20%2B%20Mistral%20%2B%20RAG&descAlignY=58&descSize=17&descColor=a89bff" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:0a0a16,45:1a1a3e,100:2d1b69&height=240&section=header&text=NEXUS%20AI&fontSize=62&fontColor=ffffff&animation=fadeIn&fontAlignY=32&desc=Meeting%20Intelligence%20%E2%80%A2%20Groq%20Whisper%20%2B%20Mistral%20%2B%20RAG&descAlignY=58&descSize=17&descColor=a89bff" width="100%"/>
 
 <a href="https://git.io/typing-svg">
-  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=19&duration=2800&pause=800&color=00D4AA&center=true&vCenter=true&repeat=true&width=820&height=52&lines=Video+%E2%86%92+Transcript+%E2%86%92+Insights+%E2%86%92+Chat;Local+Whisper+STT+%E2%80%A2+Cloud+Mistral+LLM;Action+Items+%E2%80%A2+Decisions+%E2%80%A2+Open+Questions;YouTube+URLs+%26+Local+Media+Supported" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=19&duration=2800&pause=800&color=00D4AA&center=true&vCenter=true&repeat=true&width=820&height=52&lines=Video+%E2%86%92+Transcript+%E2%86%92+Insights+%E2%86%92+Chat;Groq+Whisper+STT+%E2%80%A2+Cloud+Mistral+LLM;Action+Items+%E2%80%A2+Decisions+%E2%80%A2+Open+Questions;YouTube+URLs+%26+Local+Media+Supported" alt="Typing SVG" />
 </a>
 
 <br/>
@@ -11,7 +11,7 @@
 <p>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" />
-  <img src="https://img.shields.io/badge/Faster--Whisper-00D4AA?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Groq%20Whisper-F55036?style=for-the-badge&logo=groq&logoColor=white" />
   <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white" />
   <img src="https://img.shields.io/badge/Mistral%20AI-FA520F?style=for-the-badge&logo=mistralai&logoColor=white" />
   <img src="https://img.shields.io/badge/ChromaDB-FF6F00?style=for-the-badge" />
@@ -20,9 +20,8 @@
 <p>
   <img src="https://img.shields.io/badge/yt--dlp-FF0000?style=flat-square&logo=youtube&logoColor=white" />
   <img src="https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logo=ffmpeg&logoColor=white" />
-  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" />
+  <img src="https://img.shields.io/badge/Groq_Whisper-F55036?style=flat-square&logo=groq&logoColor=white" />
   <img src="https://img.shields.io/badge/RAG-6C5CFF?style=flat-square" />
-  <img src="https://img.shields.io/badge/English+%7C+Hinglish-2d1b69?style=flat-square" />
 </p>
 
 </div>
@@ -31,9 +30,9 @@
 
 ## 🎯 What Is Nexus AI?
 
-**Nexus AI** is a premium meeting intelligence platform that transforms video and audio into structured, actionable knowledge. Drop in a YouTube link or local recording — the system transcribes speech locally, summarizes with Mistral, extracts decisions and action items, and lets you **chat with the meeting** through a retrieval-augmented pipeline.
+**Nexus AI** is a premium meeting intelligence platform that transforms video and audio into structured, actionable knowledge. Drop in a YouTube link or local recording — the system transcribes speech with Groq Whisper, summarizes with Mistral, extracts decisions and action items, and lets you **chat with the meeting** through a retrieval-augmented pipeline.
 
-> Hybrid by design: **local speech-to-text** keeps transcription free and private, while **Mistral AI** powers summarization, extraction, embeddings, and conversational Q&A.
+> Hybrid by design: **cloud speech-to-text** through Groq keeps transcription fast, while **Mistral AI** powers summarization, extraction, embeddings, and conversational Q&A.
 
 <br/>
 
@@ -41,11 +40,11 @@
 
 ```
 ┌─────────────┐   ┌──────────────┐   ┌─────────────┐   ┌──────────────┐   ┌─────────────┐   ┌──────────┐
-│  1. Audio   │ → │ 2. Whisper   │ → │ 3. Title    │ → │ 4. Summary   │ → │ 5. Extract  │ → │ 6. RAG   │
+│  1. Audio   │ → │ 2. Groq STT   │ → │ 3. Title    │ → │ 4. Summary   │ → │ 5. Extract  │ → │ 6. RAG   │
 │  Ingestion  │   │ Transcription│   │ Generation  │   │  (Map-Reduce)│   │  Insights   │   │  Engine  │
 └─────────────┘   └──────────────┘   └─────────────┘   └──────────────┘   └─────────────┘   └──────────┘
- yt-dlp / pydub    faster-whisper      Mistral LLM        Mistral LLM         Mistral LLM      ChromaDB
- FFmpeg chunking   CPU · int8           8-word title       bullet summary      3 extractors     + Mistral
+ yt-dlp / pydub    Groq Whisper API     Mistral LLM        Mistral LLM         Mistral LLM      ChromaDB
+ FFmpeg chunking   cloud transcription  8-word title       bullet summary      3 extractors     + Mistral
 ```
 
 <br/>
@@ -65,8 +64,8 @@ flowchart TB
         CH["10-min Chunks"]
     end
 
-    subgraph STT["🔊 Speech-to-Text — Local"]
-        FW["Faster-Whisper"]
+    subgraph STT["🔊 Speech-to-Text — Cloud"]
+      GW["Groq Whisper API"]
     end
 
     subgraph LLM["🤖 Mistral AI + LangChain LCEL"]
@@ -91,9 +90,9 @@ flowchart TB
     LF --> CV
     DL --> CV
     CV --> CH
-    CH --> FW
-    FW --> TI & SU & EX
-    FW --> EM
+    CH --> GW
+    GW --> TI & SU & EX
+    GW --> EM
     EM --> VS
     VS --> QA
     TI & SU & EX & QA --> ST & IN & CHAT
@@ -103,17 +102,17 @@ flowchart TB
 
 ## ✨ Capabilities
 
-| Module | What You Get |
-| :--- | :--- |
-| **Smart Transcription** | Local Faster-Whisper on CPU — English & Hinglish modes |
-| **Executive Summary** | Map-reduce summarization across long transcripts |
-| **Auto Title** | Professional meeting title generated from content |
-| **Action Items** | Tasks with owner and deadline when mentioned |
-| **Key Decisions** | Numbered list of decisions made during the meeting |
-| **Open Questions** | Unresolved topics flagged for follow-up |
-| **RAG Chat** | Ask natural-language questions grounded in the transcript |
-| **Exports** | Download transcript, actions, decisions, and questions as `.txt` |
-| **Session History** | Timeline of analyses within the current browser session |
+| Module                  | What You Get                                                     |
+| :---------------------- | :--------------------------------------------------------------- |
+| **Smart Transcription** | Groq Whisper API — fast cloud-based transcription & translation  |
+| **Executive Summary**   | Map-reduce summarization across long transcripts                 |
+| **Auto Title**          | Professional meeting title generated from content                |
+| **Action Items**        | Tasks with owner and deadline when mentioned                     |
+| **Key Decisions**       | Numbered list of decisions made during the meeting               |
+| **Open Questions**      | Unresolved topics flagged for follow-up                          |
+| **RAG Chat**            | Ask natural-language questions grounded in the transcript        |
+| **Exports**             | Download transcript, actions, decisions, and questions as `.txt` |
+| **Session History**     | Timeline of analyses within the current browser session          |
 
 <br/>
 
@@ -167,16 +166,16 @@ flowchart TB
 
 <br/>
 
-| Layer | Technology | Role |
-| :--- | :--- | :--- |
-| **UI** | Streamlit, custom CSS | Multi-page dashboard with glass-morphism theme |
-| **Ingestion** | yt-dlp, pydub, FFmpeg | YouTube download, format conversion, chunking |
-| **STT** | Faster-Whisper, ctranslate2, PyTorch | Local transcription on CPU (`int8`) |
-| **LLM** | Mistral AI (`mistral-small-2506`) | Summaries, titles, extractions, chat |
-| **Orchestration** | LangChain LCEL | Prompt chains, map-reduce, RAG pipeline |
-| **Embeddings** | Mistral Embed | Semantic indexing of transcript chunks |
-| **Vector DB** | ChromaDB | Persistent retrieval store (`vector_db/`) |
-| **Config** | python-dotenv | API keys and model settings via `.env` |
+| Layer             | Technology                                  | Role                                           |
+| :---------------- | :------------------------------------------ | :--------------------------------------------- |
+| **UI**            | Streamlit, custom CSS                       | Multi-page dashboard with glass-morphism theme |
+| **Ingestion**     | yt-dlp, pydub, FFmpeg                       | YouTube download, format conversion, chunking  |
+| **STT**           | Groq Whisper API (`whisper-large-v3-turbo`) | Cloud transcription & translation              |
+| **LLM**           | Mistral AI (`mistral-small-2506`)           | Summaries, titles, extractions, chat           |
+| **Orchestration** | LangChain LCEL                              | Prompt chains, map-reduce, RAG pipeline        |
+| **Embeddings**    | Mistral Embed                               | Semantic indexing of transcript chunks         |
+| **Vector DB**     | ChromaDB                                    | Persistent retrieval store (`vector_db/`)      |
+| **Config**        | python-dotenv                               | API keys and model settings via `.env`         |
 
 </details>
 
@@ -193,7 +192,7 @@ Video Agent/
 ├── cookies.txt             # Optional — YouTube auth cookies
 │
 ├── core/
-│   ├── transcriber.py      # Faster-Whisper load & transcribe
+│   ├── transcriber.py      # Groq Whisper API transcribe & translate
 │   ├── summarizer.py       # Map-reduce summary + title generation
 │   ├── extractor.py        # Action items, decisions, questions
 │   ├── rag_engine.py       # LCEL RAG chain + ask_question()
@@ -250,11 +249,11 @@ MISTRAL_API_KEY=your_mistral_api_key_here
 WHISPER_MODEL=base
 ```
 
-| Variable | Default | Description |
-| :--- | :--- | :--- |
-| `MISTRAL_API_KEY` | — | Required for LLM, embeddings, and chat |
-| `WHISPER_MODEL` | `base` | Whisper size: `tiny`, `base`, `small`, `medium`, `large-v3` |
-| `YTDLP_COOKIE_FILE` | `cookies.txt` | Optional path to YouTube cookies for restricted videos |
+| Variable            | Default       | Description                                                 |
+| :------------------ | :------------ | :---------------------------------------------------------- |
+| `MISTRAL_API_KEY`   | —             | Required for LLM, embeddings, and chat                      |
+| `WHISPER_MODEL`     | `base`        | Whisper size: `tiny`, `base`, `small`, `medium`, `large-v3` |
+| `YTDLP_COOKIE_FILE` | `cookies.txt` | Optional path to YouTube cookies for restricted videos      |
 
 ### Run
 
@@ -278,7 +277,7 @@ python main.py
 
 1. Open **Studio** from the sidebar
 2. Paste a **YouTube URL** or absolute **local file path** (`C:/videos/meeting.mp4`)
-3. Select **English** or **Hinglish** transcription mode
+3. Select your **transcription language**
 4. Click **Run Analysis** — watch the live pipeline stepper
 5. Review output in **Insights** — summary, transcript, extractions, downloads
 6. Switch to **Ask AI** — chat with suggested prompts or custom questions
@@ -293,19 +292,19 @@ python main.py
 
 ### Supported Sources
 
-| Source | Formats | Notes |
-| :--- | :--- | :--- |
-| YouTube | Any URL | Uses yt-dlp; optional `cookies.txt` for sign-in videos |
-| Local files | MP4, MP3, WAV, etc. | Converted via pydub → 16 kHz mono WAV |
+| Source      | Formats             | Notes                                                  |
+| :---------- | :------------------ | :----------------------------------------------------- |
+| YouTube     | Any URL             | Uses yt-dlp; optional `cookies.txt` for sign-in videos |
+| Local files | MP4, MP3, WAV, etc. | Converted via pydub → 16 kHz mono WAV                  |
 
 <br/>
 
 ## 🔬 How It Works
 
 <details>
-<summary><b>Transcription — local & free</b></summary>
+<summary><b>Transcription — Groq Whisper API</b></summary>
 
-Audio is split into **10-minute chunks** and processed by **Faster-Whisper** on CPU with `int8` quantization. The model loads once and is reused across chunks. Hinglish mode enables Whisper's translate task for Hindi-English code-mixed speech.
+Audio is split into **10-minute chunks** and sent to the **Groq Whisper API** (`whisper-large-v3-turbo`) for fast cloud-based transcription. The translation endpoint is used for non-English audio to produce English output.
 
 </details>
 
@@ -320,6 +319,7 @@ Long transcripts are split into 3 000-character segments. Each chunk is summariz
 <summary><b>Extraction — specialized prompts</b></summary>
 
 Three dedicated LangChain chains run against the full transcript:
+
 - **Action items** — task, owner, deadline
 - **Key decisions** — numbered decision log
 - **Open questions** — unresolved follow-ups
@@ -350,19 +350,19 @@ YTDLP_COOKIE_FILE=C:/path/to/cookies.txt
 
 **Whisper model trade-offs:**
 
-| Model | Speed | Accuracy | RAM |
-| :--- | :---: | :---: | :---: |
-| `tiny` | ⚡⚡⚡ | ★★ | ~1 GB |
-| `base` | ⚡⚡ | ★★★ | ~1 GB |
-| `small` | ⚡ | ★★★★ | ~2 GB |
-| `medium` | 🐢 | ★★★★★ | ~5 GB |
+| Model    | Speed  | Accuracy |  RAM  |
+| :------- | :----: | :------: | :---: |
+| `tiny`   | ⚡⚡⚡ |    ★★    | ~1 GB |
+| `base`   |  ⚡⚡  |   ★★★    | ~1 GB |
+| `small`  |   ⚡   |   ★★★★   | ~2 GB |
+| `medium` |   🐢   |  ★★★★★   | ~5 GB |
 
 <br/>
 
 ## 🗺️ Roadmap
 
 - [x] YouTube + local file ingestion
-- [x] Faster-Whisper local transcription (English / Hinglish)
+- [x] Groq Whisper API transcription & translation
 - [x] Map-reduce summarization with Mistral
 - [x] Action items, decisions, and questions extraction
 - [x] ChromaDB RAG chat with mistral-embed

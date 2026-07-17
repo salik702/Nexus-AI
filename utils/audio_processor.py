@@ -17,6 +17,13 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 DEFAULT_CHUNK_MINUTES = int(os.getenv("AUDIO_CHUNK_MINUTES", "1"))
 
+YOUTUBE_CLIENT_PROFILES = [
+    None,
+    ["android"],
+    ["ios"],
+    ["web", "android"],
+]
+
 
 def _resolve_cookiefile() -> str | None:
     secret_cookie_file = _get_secret("YTDLP_COOKIE_FILE")
@@ -56,11 +63,10 @@ def _ensure_cookiefile_from_content() -> str | None:
     return cookie_path
 
 
-def download_youtube_audio(url: str) -> str:
-    output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
+def _build_ydl_opts(player_clients: list[str] | None = None) -> dict:
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": output_path,
+        "outtmpl": os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s"),
         "ignoreconfig": True,
         "noplaylist": True,
         "retries": 3,
@@ -84,21 +90,50 @@ def download_youtube_audio(url: str) -> str:
         ],
         "quiet": True,
     }
+
+    if player_clients:
+        ydl_opts["extractor_args"] = {"youtube": {"player_client": player_clients}}
+
     cookiefile = _resolve_cookiefile() or _ensure_cookiefile_from_content()
     if cookiefile:
         ydl_opts["cookiefile"] = cookiefile
-    else:
+
+    return ydl_opts
+
+
+def download_youtube_audio(url: str) -> str:
+    last_error = None
+
+    if not (_resolve_cookiefile() or _resolve_cookie_content()):
         print(
             "No cookies found; if YouTube blocks the request, add cookies to Streamlit secrets as YTDLP_COOKIE_CONTENT or upload cookies.txt."
         )
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        filename = (
-            ydl.prepare_filename(info).replace(".webm", ".wav").replace(".m4a", ".wav")
-        )
+    for player_clients in YOUTUBE_CLIENT_PROFILES:
+        try:
+            client_name = ",".join(player_clients) if player_clients else "default"
+            print(f"Trying YouTube client profile: {client_name}")
+            with yt_dlp.YoutubeDL(_build_ydl_opts(player_clients)) as ydl:
+                info = ydl.extract_info(url, download=True)
+                filename = (
+                    ydl.prepare_filename(info)
+                    .replace(".webm", ".wav")
+                    .replace(".m4a", ".wav")
+                )
+                return filename
+        except Exception as error:
+            last_error = error
+            message = str(error)
+            print(
+                f"YouTube download failed for profile {player_clients or 'default'}: {message}"
+            )
+            if "403" not in message and "Forbidden" not in message:
+                raise
 
-    return filename
+    raise RuntimeError(
+        "Unable to download video data from YouTube after trying multiple client profiles. "
+        "If the video is age-restricted, region-restricted, or members-only, add valid cookies to Streamlit Secrets as YTDLP_COOKIE_CONTENT."
+    ) from last_error
 
 
 def convert_to_wav(input_path: str) -> str:

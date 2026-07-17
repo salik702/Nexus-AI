@@ -4,7 +4,6 @@ from pathlib import Path
 
 import httpx
 from groq import Groq
-from pydub import AudioSegment
 
 _client = None
 
@@ -46,6 +45,8 @@ def _is_request_too_large(error: Exception) -> bool:
 
 
 def _split_audio_file(chunk_path: Path) -> list[Path]:
+    from pydub import AudioSegment
+
     audio = AudioSegment.from_file(chunk_path)
     if len(audio) < 2000:
         raise ValueError(f"{chunk_path} is too small to split any further.")

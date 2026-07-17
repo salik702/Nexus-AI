@@ -1,5 +1,16 @@
 import yt_dlp
 import os
+from pathlib import Path
+
+
+def _get_secret(name: str):
+    try:
+        import streamlit as st
+
+        return st.secrets.get(name)
+    except Exception:
+        return None
+
 
 DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -8,6 +19,10 @@ DEFAULT_CHUNK_MINUTES = int(os.getenv("AUDIO_CHUNK_MINUTES", "1"))
 
 
 def _resolve_cookiefile() -> str | None:
+    secret_cookie_file = _get_secret("YTDLP_COOKIE_FILE")
+    if secret_cookie_file and os.path.isfile(str(secret_cookie_file)):
+        return str(secret_cookie_file)
+
     candidates = [
         os.getenv("YTDLP_COOKIE_FILE"),
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "cookies.txt"),
@@ -21,12 +36,45 @@ def _resolve_cookiefile() -> str | None:
     return None
 
 
+def _resolve_cookie_content() -> str | None:
+    secret_cookie_content = _get_secret("YTDLP_COOKIE_CONTENT")
+    if secret_cookie_content:
+        return str(secret_cookie_content)
+
+    return os.getenv("YTDLP_COOKIE_CONTENT")
+
+
+def _ensure_cookiefile_from_content() -> str | None:
+    cookie_content = _resolve_cookie_content()
+    if not cookie_content:
+        return None
+
+    cookie_path = os.path.join(DOWNLOAD_DIR, "streamlit_cookies.txt")
+    with open(cookie_path, "w", encoding="utf-8") as cookie_file:
+        cookie_file.write(cookie_content)
+
+    return cookie_path
+
+
 def download_youtube_audio(url: str) -> str:
     output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": output_path,
         "ignoreconfig": True,
+        "noplaylist": True,
+        "retries": 3,
+        "extractor_retries": 3,
+        "socket_timeout": 30,
+        "geo_bypass": True,
+        "http_headers": {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/126.0.0.0 Safari/537.36"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
+        },
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
@@ -36,12 +84,12 @@ def download_youtube_audio(url: str) -> str:
         ],
         "quiet": True,
     }
-    cookiefile = _resolve_cookiefile()
+    cookiefile = _resolve_cookiefile() or _ensure_cookiefile_from_content()
     if cookiefile:
         ydl_opts["cookiefile"] = cookiefile
     else:
         print(
-            "No cookies.txt found; if this video requires sign-in, export cookies to cookies.txt or set YTDLP_COOKIE_FILE."
+            "No cookies found; if YouTube blocks the request, add cookies to Streamlit secrets as YTDLP_COOKIE_CONTENT or upload cookies.txt."
         )
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:

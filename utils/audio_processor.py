@@ -1,6 +1,8 @@
-import yt_dlp
 import os
 from pathlib import Path
+import tempfile
+
+import yt_dlp
 
 
 def _get_secret(name: str):
@@ -27,8 +29,20 @@ YOUTUBE_CLIENT_PROFILES = [
 
 def _resolve_cookiefile() -> str | None:
     secret_cookie_file = _get_secret("YTDLP_COOKIE_FILE")
-    if secret_cookie_file and os.path.isfile(str(secret_cookie_file)):
-        return str(secret_cookie_file)
+    if secret_cookie_file:
+        secret_cookie_text = str(secret_cookie_file).strip()
+        if os.path.isfile(secret_cookie_text):
+            return secret_cookie_text
+
+        if secret_cookie_text and (
+            "# Netscape HTTP Cookie File" in secret_cookie_text
+            or "\t" in secret_cookie_text
+            or "youtube.com" in secret_cookie_text
+        ):
+            cookie_path = os.path.join(DOWNLOAD_DIR, "streamlit_secret_cookies.txt")
+            with open(cookie_path, "w", encoding="utf-8") as cookie_file:
+                cookie_file.write(secret_cookie_text)
+            return cookie_path
 
     candidates = [
         os.getenv("YTDLP_COOKIE_FILE"),
@@ -155,15 +169,32 @@ def _candidate_download_formats(info: dict) -> list[str]:
 def download_youtube_audio(url: str) -> str:
     last_error = None
 
-    if not (_resolve_cookiefile() or _resolve_cookie_content()):
+    cookiefile = _resolve_cookiefile() or _ensure_cookiefile_from_content()
+    if not cookiefile:
         print(
-            "No cookies found; if YouTube blocks the request, add cookies to Streamlit secrets as YTDLP_COOKIE_CONTENT or upload cookies.txt."
+            "No valid cookies found; if YouTube blocks the request, add a Netscape cookie export to Streamlit secrets as YTDLP_COOKIE_CONTENT."
         )
 
     for player_clients in YOUTUBE_CLIENT_PROFILES:
         try:
             client_name = ",".join(player_clients) if player_clients else "default"
             print(f"Trying YouTube client profile: {client_name}")
+
+            # Try yt-dlp's own audio selector first. Some videos expose a different
+            # set of formats on Streamlit Cloud than they do locally, so an explicit
+            # candidate list can be too strict.
+            fallback_opts = _build_ydl_opts(player_clients)
+            fallback_opts["format"] = "bestaudio/best"
+            with yt_dlp.YoutubeDL(fallback_opts) as ydl:
+                info = ydl.extract_info(url, download=True)
+                filename = (
+                    ydl.prepare_filename(info)
+                    .replace(".webm", ".wav")
+                    .replace(".m4a", ".wav")
+                    .replace(".mp3", ".wav")
+                )
+                return filename
+
             with yt_dlp.YoutubeDL(_build_ydl_opts(player_clients)) as ydl:
                 info = ydl.extract_info(url, download=False)
                 candidate_formats = _candidate_download_formats(info)
@@ -184,6 +215,7 @@ def download_youtube_audio(url: str) -> str:
                             ydl.prepare_filename(info)
                             .replace(".webm", ".wav")
                             .replace(".m4a", ".wav")
+                            .replace(".mp3", ".wav")
                         )
                         return filename
                 except Exception as format_error:
@@ -203,12 +235,16 @@ def download_youtube_audio(url: str) -> str:
             print(
                 f"YouTube download failed for profile {player_clients or 'default'}: {message}"
             )
-            if "403" not in message and "Forbidden" not in message:
+            if (
+                "403" not in message
+                and "Forbidden" not in message
+                and "Requested format is not available" not in message
+            ):
                 raise
 
     raise RuntimeError(
         "Unable to download video data from YouTube after trying multiple client profiles. "
-        "If the video is age-restricted, region-restricted, or members-only, add valid cookies to Streamlit Secrets as YTDLP_COOKIE_CONTENT."
+        "If the video is age-restricted, region-restricted, or members-only, add valid Netscape-formatted cookies to Streamlit Secrets as YTDLP_COOKIE_CONTENT."
     ) from last_error
 
 
